@@ -3,6 +3,7 @@
 import asyncio
 import random
 import logging
+import argparse
 
 from Peers import Peers
 from datetime import datetime
@@ -44,10 +45,12 @@ def main():
     logging.basicConfig(format='%(message)s',
                         encoding='utf-8',
                         level=logging.INFO)
-    # todo: argparser
-    port = 22222
-
-    asyncio.run(start_server(port))
+    
+    parser = argparse.ArgumentParser(description="SSH Tarpit")
+    parser.add_argument('--port', '-p', help="Set Port for the Tarpit (default 22222)", default=22222, type=int, action="store")
+    args = parser.parse_args()
+    
+    asyncio.run(start_server(args.port))
 
 
 if __name__ == "__main__":
