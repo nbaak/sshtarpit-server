@@ -1,5 +1,5 @@
 
-import time
+import datetime
 
 
 class Peers:
@@ -9,7 +9,7 @@ class Peers:
     @classmethod
     def add_peer(cls, peer:str) -> bool:
         if peer not in cls.connections:
-            cls.connections[peer] = time.time()
+            cls.connections[peer] = datetime.datetime.now()
             return True
         return False
 
@@ -20,5 +20,20 @@ class Peers:
 
     @classmethod
     def get_connection_duration(cls, peer:str) -> float:
-        return time.time() - cls.connections[peer]
+        return datetime.datetime.now() - cls.connections[peer]
 
+    @classmethod
+    def sort(cls):
+        return sorted(cls.connections.items(), key=lambda p: p[1])
+
+    @classmethod
+    def number_open_connections(cls) -> int:
+        return len(cls.connections)
+        
+        
+        
+        
+        
+        
+        
+        

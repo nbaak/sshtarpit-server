@@ -5,6 +5,7 @@ import random
 import logging
 
 from Peers import Peers
+from datetime import datetime
 
 
 async def server(_reader, _writer):
@@ -12,7 +13,9 @@ async def server(_reader, _writer):
         while True:
             peer = ':'.join(map(str, _reader._transport.get_extra_info('peername')))
             if Peers.add_peer(peer):
-                logging.info(f'CONNECTED: {peer} at {Peers.connections[peer]}')
+                connection_time = Peers.connections[peer]
+                timestamp = connection_time.strftime("%Y-%m-%d %H:%M:%S")
+                logging.info(f'[{timestamp}] ACCEPT host={peer}')
 
             _writer.write(b'%x\r\n' % random.randint(0, 2 ** 32))
 
@@ -20,9 +23,12 @@ async def server(_reader, _writer):
             await _writer.drain()
 
     except BrokenPipeError:
-        Peers.remove_peer(peer)
-        duration = Peers.get_connection_duration(peer)
-        logging.info(f'DISCONNECTED: {peer} - {duration}')
+        connection_duration = Peers.get_connection_duration(peer)
+        
+        Peers.remove_peer(peer) # remove peer
+        
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        logging.info(f'[{timestamp}] CLOSE host={peer} time={connection_duration.total_seconds()}')
 
     except:
         logging.error('something bad happened')
