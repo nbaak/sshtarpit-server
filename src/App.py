@@ -5,6 +5,8 @@ import random
 import logging
 import argparse
 
+import Settings
+
 from Peers import Peers
 from datetime import datetime
 from asyncio.streams import StreamReader, StreamWriter
@@ -13,31 +15,34 @@ from asyncio.streams import StreamReader, StreamWriter
 async def server(reader:StreamReader, writer:StreamWriter):
     try:
         while True:
-            peer = ':'.join(map(str, reader._transport.get_extra_info('peername')))
+            ip, port = reader._transport.get_extra_info('peername')
+            peer = (ip, port)
             if Peers.add_peer(peer):
                 connection_time = Peers.connections[peer]
                 timestamp = connection_time.strftime("%Y-%m-%d %H:%M:%S")
-                logging.info(f'[{timestamp}] ACCEPT host={peer}')
-
+                logging.info(f'[{timestamp}] ACCEPT host={ip} port={port}')
+            
             writer.write(b'%x\r\n' % random.randint(0, 2 ** 32))
 
-            await asyncio.sleep(3)
+            await asyncio.sleep(Settings.sleep_time)
             await writer.drain()
 
     except BrokenPipeError:
+        # Peer disconnected
         connection_duration = Peers.get_connection_duration(peer)
 
-        Peers.remove_peer(peer)  # remove peer
+        Peers.remove_peer(peer)
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        logging.info(f'[{timestamp}] CLOSE host={peer} time={connection_duration.total_seconds()}')
+        logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
 
-    except:
+    except Exception as e:
         logging.error('something bad happened')
+        logging.error(e)
 
 
-async def start_server(port):
-    connection = await asyncio.start_server(server, '0.0.0.0', port)
+async def start_server(host, port):
+    connection = await asyncio.start_server(server, host, port)
     async with connection:
         await connection.serve_forever()
 
@@ -48,10 +53,14 @@ def main():
                         level=logging.INFO)
 
     parser = argparse.ArgumentParser(description="SSH Tarpit")
-    parser.add_argument('--port', '-p', help="Set Port for the Tarpit (default 22222)", default=22222, type=int, action="store")
+    parser.add_argument('--port', '-p', help=f"Set Port for the Tarpit (default {Settings.port})", default=Settings.port, type=int, action="store")
+    parser.add_argument('--host', '-H', help=f"Set Host for the Tarpit (default {Settings.host})", default=Settings.host, type=str, action="store")
+    parser.add_argument('--time', '-t', help=f"Set sleep time for ssh conenctions (default {Settings.sleep_time} in seconds)", default=Settings.sleep_time, type=float, action="store")
     args = parser.parse_args()
 
-    asyncio.run(start_server(args.port))
+    Settings.sleep_time = args.time
+
+    asyncio.run(start_server(args.host, args.port))
 
 
 if __name__ == "__main__":
