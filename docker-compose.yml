@@ -1,10 +1,16 @@
 version: '3.1'
 
 services:
+
+  geoip:
+    image: k3nny0r/geoip
+    ports:
+    - 127.0.0.1:5000:5000
+    restart: always
+
   sshtarpit:
     build: .
     image: k3nny/sshtarpit
-    container_name: sshtarpit
     ports:
     - 0.0.0.0:22222:22222
     restart: always
