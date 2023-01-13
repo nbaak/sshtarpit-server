@@ -23,14 +23,13 @@ async def server(reader:StreamReader, writer:StreamWriter):
                 logging.info(f'[{timestamp}] ACCEPT host={ip} port={port}')
             
             writer.write(b'%x\r\n' % random.randint(0, 2 ** 32))
+            connection_duration = Peers.get_connection_duration(peer)
 
             await asyncio.sleep(Settings.sleep_time)
             await writer.drain()
 
     except BrokenPipeError:
         # Peer disconnected
-        connection_duration = Peers.get_connection_duration(peer)
-
         Peers.remove_peer(peer)
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
