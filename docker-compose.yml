@@ -5,7 +5,7 @@ services:
   geoip:
     image: k3nny0r/geoip
     ports:
-    - 127.0.0.1:5000:5000
+    - 127.0.0.1:22223:5000
     restart: always
 
   sshtarpit:
