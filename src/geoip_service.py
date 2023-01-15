@@ -5,7 +5,7 @@ import Settings
 
 
 def get_location_data(ip:str):
-    
+
     if Settings.geoip_service:
         geoip_data = requests.get(Settings.geoip_service + '/' + str(ip)).json()
         country_code = geoip_data['code'] if not '-' else 'unkown'
@@ -13,6 +13,5 @@ def get_location_data(ip:str):
     else:
         country = 'unknown'
         country_code = 'unknown'
-    
-    
+
     return country_code, country
