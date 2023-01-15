@@ -15,23 +15,23 @@ from asyncio.streams import StreamReader, StreamWriter
 
 async def server(reader:StreamReader, writer:StreamWriter):
     try:
+        ip, port = reader._transport.get_extra_info('peername')
+        peer = (ip, port)
+        Peers.add_peer(peer)
+        connection_time = Peers.connections[peer]
+        timestamp = connection_time.strftime('%Y-%m-%d %H:%M:%S')
+        
+        if Settings.geoip_service:
+            data = requests.get(Settings.geoip_service + '/' + str(ip)).json()
+            country_code = data['code'] if not '-' else 'unkown'
+            country = data['country'] if not '-' else 'unkown'
+        else:
+            country = 'unknown'
+            country_code = 'unknown'
+            
+        logging.info(f'[{timestamp}] ACCEPT host={ip} port={port} country={country} country_code={country_code}')
+        
         while True:
-            ip, port = reader._transport.get_extra_info('peername')
-            peer = (ip, port)
-            if Peers.add_peer(peer):
-                connection_time = Peers.connections[peer]
-                timestamp = connection_time.strftime('%Y-%m-%d %H:%M:%S')
-                
-                if Settings.geoip_service:
-                    data = requests.get(Settings.geoip_service + '/' + str(ip)).json()
-                    country_code = data['code'] if not '-' else 'unkown'
-                    country = data['country'] if not '-' else 'unkown'
-                else:
-                    country = 'unknown'
-                    country_code = 'unknown'
-                    
-                logging.info(f'[{timestamp}] ACCEPT host={ip} port={port} country={country} country_code={country_code}')
-
             writer.write(b'%x\r\n' % random.randint(0, 2 ** 32))
             connection_duration = Peers.get_connection_duration(peer)
 
