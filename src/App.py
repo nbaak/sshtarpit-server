@@ -5,12 +5,12 @@ import random
 import logging
 import argparse
 import requests
-
 import Settings
 
 from Peers import Peers
 from datetime import datetime
 from asyncio.streams import StreamReader, StreamWriter
+from geoip_service import get_location_data
 
 
 async def server(reader:StreamReader, writer:StreamWriter):
@@ -21,13 +21,7 @@ async def server(reader:StreamReader, writer:StreamWriter):
         connection_time = Peers.connections[peer]
         timestamp = connection_time.strftime('%Y-%m-%d %H:%M:%S')
         
-        if Settings.geoip_service:
-            data = requests.get(Settings.geoip_service + '/' + str(ip)).json()
-            country_code = data['code'] if not '-' else 'unkown'
-            country = data['country'] if not '-' else 'unkown'
-        else:
-            country = 'unknown'
-            country_code = 'unknown'
+        country_code, country = get_location_data(ip)
             
         logging.info(f'[{timestamp}] ACCEPT host={ip} port={port} country={country} country_code={country_code}')
         
