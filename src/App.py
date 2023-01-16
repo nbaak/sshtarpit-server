@@ -59,7 +59,7 @@ def main():
     parser.add_argument('--port', '-p', help=f'Set Port for the Tarpit (default {Settings.port})', default=Settings.port, type=int, action='store')
     parser.add_argument('--host', '-H', help=f'Set Host for the Tarpit (default {Settings.host})', default=Settings.host, type=str, action='store')
     parser.add_argument('--time', '-t', help=f'Set sleep time for ssh conenctions (default {Settings.sleep_time} in seconds)', default=Settings.sleep_time, type=float, action='store')
-    parser.add_argument('--geoip', '-g', help=f'Set own Geoip Service. Pattern: http://url/<ip>, default (http://localhost:5000)', default=Settings.geoip_service, type=str, action='store')
+    parser.add_argument('--geoip', '-g', help=f'Set own Geoip Service. Pattern: http://domain/<ip>, (default {Settings.geoip_service})', default=Settings.geoip_service, type=str, action='store')
     args = parser.parse_args()
 
     Settings.sleep_time = args.time
