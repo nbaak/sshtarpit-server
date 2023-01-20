@@ -2,10 +2,25 @@ version: '3.1'
 
 services:
 
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    command: 
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=45d
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+      - --web.enable-admin-api
+    ports:
+      - 127.0.0.1:22225:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
   geoip:
     image: k3nny0r/geoip
     ports:
-    - 127.0.0.1:22223:5000
+    - 127.0.0.1:22223:22223
     restart: always
 
   sshtarpit:
@@ -13,5 +28,6 @@ services:
     image: k3nny/sshtarpit
     ports:
     - 0.0.0.0:22222:22222
+    - 127.0.0.1:22224:22224
     restart: always
 

@@ -4,8 +4,9 @@ import asyncio
 import random
 import logging
 import argparse
-import requests
+
 import Settings
+import prometheus
 
 from Peers import Peers
 from datetime import datetime
@@ -20,11 +21,16 @@ async def server(reader:StreamReader, writer:StreamWriter):
         Peers.add_peer(peer)
         connection_time = Peers.connections[peer]
         timestamp = connection_time.strftime('%Y-%m-%d %H:%M:%S')
-        
+
         country_code, country = get_location_data(ip)
-            
+
         logging.info(f'[{timestamp}] ACCEPT host={ip} port={port} country={country} country_code={country_code}')
-        
+
+        # prometheus logging
+        prometheus.inc('connections_total')
+        prometheus.inc('connections_started')
+        prometheus.inc('connections_per_ip', [ip, country_code])
+
         while True:
             writer.write(b'%x\r\n' % random.randint(0, 2 ** 32))
             connection_duration = Peers.get_connection_duration(peer)
@@ -32,12 +38,16 @@ async def server(reader:StreamReader, writer:StreamWriter):
             await asyncio.sleep(Settings.sleep_time)
             await writer.drain()
 
+            prometheus.inc('connection_duration', [ip], Settings.sleep_time)
+
     except BrokenPipeError:
         # Peer disconnected
         Peers.remove_peer(peer)
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
+
+        # prometheus.inc('connections_stopped')
 
     except Exception as e:
         logging.error('something bad happened')
@@ -69,4 +79,5 @@ def main():
 
 
 if __name__ == '__main__':
+    prometheus.start_server()
     main()
