@@ -5,7 +5,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     restart: always
-    command: 
+    command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
       - --storage.tsdb.retention.time=45d
@@ -19,8 +19,10 @@ services:
 
   geoip:
     image: k3nny0r/geoip
+    env_file:
+      - ./geoip/geoip.env
     ports:
-    - 127.0.0.1:22223:22223
+      - 127.0.0.1:22223:22223
     restart: always
 
   sshtarpit:
