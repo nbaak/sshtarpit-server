@@ -27,7 +27,6 @@ async def server(reader:StreamReader, writer:StreamWriter):
         logging.info(f'[{timestamp}] ACCEPT host={ip} port={port} country={country} country_code={country_code}')
 
         # prometheus logging
-        prometheus.inc('connections_total')
         prometheus.inc('connections_started')
         prometheus.inc('connections_per_ip', [ip, country_code])
 
@@ -47,11 +46,11 @@ async def server(reader:StreamReader, writer:StreamWriter):
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
 
-        # prometheus.inc('connections_stopped')
+        prometheus.inc('connections_stopped')
 
     except Exception as e:
         logging.error('something bad happened')
-        logging.error(e)
+        logging.error(str(e))
 
 
 async def start_server(host, port):
