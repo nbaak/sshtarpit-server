@@ -5,10 +5,10 @@ import random
 import logging
 import argparse
 
-import Settings
+import settings
 import prometheus
 
-from Peers import Peers
+from peers import Peers
 from datetime import datetime
 from asyncio.streams import StreamReader, StreamWriter
 from geoip_service import get_location_data
@@ -34,10 +34,10 @@ async def server(reader:StreamReader, writer:StreamWriter):
             writer.write(b'%x\r\n' % random.randint(0, 2 ** 32))
             connection_duration = Peers.get_connection_duration(peer)
 
-            await asyncio.sleep(Settings.sleep_time)
+            await asyncio.sleep(settings.sleep_time)
             await writer.drain()
 
-            prometheus.inc('connection_duration', [ip], Settings.sleep_time)
+            prometheus.inc('connection_duration', [ip], settings.sleep_time)
 
     except BrokenPipeError:
         # Peer disconnected
@@ -65,14 +65,14 @@ def main():
                         level=logging.INFO)
 
     parser = argparse.ArgumentParser(description='SSH Tarpit')
-    parser.add_argument('--port', '-p', help=f'Set Port for the Tarpit (default {Settings.port})', default=Settings.port, type=int, action='store')
-    parser.add_argument('--host', '-H', help=f'Set Host for the Tarpit (default {Settings.host})', default=Settings.host, type=str, action='store')
-    parser.add_argument('--time', '-t', help=f'Set sleep time for ssh conenctions (default {Settings.sleep_time} in seconds)', default=Settings.sleep_time, type=float, action='store')
-    parser.add_argument('--geoip', '-g', help=f'Set own Geoip Service. Pattern: http://domain/<ip>, (default {Settings.geoip_service})', default=Settings.geoip_service, type=str, action='store')
+    parser.add_argument('--port', '-p', help=f'Set Port for the Tarpit (default {settings.port})', default=settings.port, type=int, action='store')
+    parser.add_argument('--host', '-H', help=f'Set Host for the Tarpit (default {settings.host})', default=settings.host, type=str, action='store')
+    parser.add_argument('--time', '-t', help=f'Set sleep time for ssh conenctions (default {settings.sleep_time} in seconds)', default=settings.sleep_time, type=float, action='store')
+    parser.add_argument('--geoip', '-g', help=f'Set own Geoip Service. Pattern: http://domain/<ip>, (default {settings.geoip_service})', default=settings.geoip_service, type=str, action='store')
     args = parser.parse_args()
 
-    Settings.sleep_time = args.time
-    Settings.geoip_service = args.geoip
+    settings.sleep_time = args.time
+    settings.geoip_service = args.geoip
 
     asyncio.run(start_server(args.host, args.port))
 

@@ -10,4 +10,4 @@ RUN apt-get update && \
 ADD src/ /tarpit/
 
 EXPOSE 22222
-ENTRYPOINT /tarpit/App.py
+ENTRYPOINT /tarpit/app.py

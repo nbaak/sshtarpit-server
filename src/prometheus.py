@@ -1,6 +1,6 @@
 
 import prometheus_client as prom
-import Settings
+import settings
 
 metrics = {}
 
@@ -13,7 +13,7 @@ def initialize():
 
 
 def inc(metric, labels=None, value=1):
-    if metric in metrics and Settings.prometheus_enabled:
+    if metric in metrics and settings.prometheus_enabled:
         if labels:
             metrics[metric].labels(*labels).inc(value)
         else:
@@ -21,7 +21,7 @@ def inc(metric, labels=None, value=1):
 
 
 def start_server():
-    if Settings.prometheus_enabled:
+    if settings.prometheus_enabled:
         initialize()
 
-        prom.start_http_server(Settings.prometheus_port)
+        prom.start_http_server(settings.prometheus_port)
