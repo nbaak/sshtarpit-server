@@ -6,7 +6,7 @@ import logging
 import argparse
 
 import settings
-import prometheus
+from countit_adapter import countit, initialize
 
 from peers import Peers
 from datetime import datetime
@@ -27,8 +27,8 @@ async def server(reader:StreamReader, writer:StreamWriter):
         logging.info(f'[{timestamp}] ACCEPT host={ip} port={port} country={country} country_code={country_code}')
 
         # prometheus logging
-        prometheus.inc('connections_started')
-        prometheus.inc('connections_per_ip', [ip, country_code])
+        countit.inc('connections', label="started")
+        countit.inc('connections_per_ip', label=[ip, country_code])
 
         while True:
             writer.write(b'%x\r\n' % random.randint(0, 2 ** 32))
@@ -37,7 +37,7 @@ async def server(reader:StreamReader, writer:StreamWriter):
             await asyncio.sleep(settings.sleep_time)
             await writer.drain()
 
-            prometheus.inc('connection_duration', [ip], settings.sleep_time)
+            countit.inc('connection_duration', label=ip, value=settings.sleep_time)
 
     except BrokenPipeError:
         # Peer disconnected
@@ -46,7 +46,7 @@ async def server(reader:StreamReader, writer:StreamWriter):
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
 
-        prometheus.inc('connections_stopped')
+        countit.inc('connections', label='stopped')
 
     except Exception as e:
         logging.error('something bad happened')
@@ -78,5 +78,5 @@ def main():
 
 
 if __name__ == '__main__':
-    prometheus.start_server()
+    initialize()
     main()

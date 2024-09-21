@@ -8,6 +8,7 @@ RUN apt-get update && \
     echo "DONE"
 
 ADD src/ /tarpit/
+WORKDIR /tarpit
 
 EXPOSE 22222
-ENTRYPOINT /tarpit/app.py
+CMD ["/tarpit/entrypoint.sh"]
