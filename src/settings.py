@@ -12,7 +12,7 @@ sleep_time = 5
 geoip_service = env_vars.get("GEOIP_SERVER", None)
 
 # Countit
-countit_secret = env_vars.get("AUTH_TOKEN", None)
+countit_secret = env_vars.get("COUNTIT_AUTH_TOKEN", None)
 countit_server = env_vars.get("COUNTIT_SERVER", None)
 countit_port = env_vars.get("COUNTIT_PORT", None)
 

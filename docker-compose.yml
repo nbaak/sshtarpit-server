@@ -1,15 +1,18 @@
 version: '3.1'
 
+volumes:
+  app-data:
+
 services:
 
   countit:
     image: k3nny0r/countit
     ports:
-      - 127.0.0.1:5050:5000
+      - 127.0.0.1:5050:5050
     env_file:
       - ./countit/countit.env
     volumes:
-      - ./data:/app/data_metrics
+      - app-data:/app/data_metrics
     restart: unless-stopped
 
   sshtarpit:
@@ -21,4 +24,6 @@ services:
     ports:
       - 0.0.0.0:22222:22222
       - 127.0.0.1:22224:22224
+    depends_on:
+      - countit
     restart: unless-stopped

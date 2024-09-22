@@ -5,7 +5,7 @@ SSH Tarpit Server inspired by skeeto's <a href="https://github.com/skeeto/endles
 ## Port Map
 Ports and Services
 
-- 3000: Grafana
+- 5050: Countit
 - 22222: SSH (Tarpit)
 - 22223: Geoip
 - 22224: SSHTarpit

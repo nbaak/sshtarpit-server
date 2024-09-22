@@ -1,15 +1,22 @@
-
-
+import logging
 import settings
 from countit_client import CountItClient
 
-countit:CountItClient = CountItClient(server=settings.countit_server, 
-                                      port=settings.countit_port, 
-                                      token_file="countit.token")
-
 
 def initialize():
+    # ceate connection
+    global countit
+    countit = CountItClient(server=settings.countit_server,
+                                      port=settings.countit_port,
+                                      token=settings.countit_secret)
+    
     # create metrics
-    countit.add_metric("connections")
-    countit.add_metric("connections_per_ip")
-    countit.add_metric("connection_duration")
+    try:
+        cons = countit.add_metric("connections")
+        cons_ip = countit.add_metric("connections_per_ip")
+        cons_dur = countit.add_metric("connection_duration")
+        logging.info(f"cons: {cons}")
+    except Exception as e:
+        print(f"EXECPTION: {e}")
+        
+    return countit

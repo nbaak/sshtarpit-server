@@ -6,12 +6,22 @@ import logging
 import argparse
 
 import settings
-from countit_adapter import countit, initialize
+from countit_adapter import initialize
 
 from peers import Peers
 from datetime import datetime
 from asyncio.streams import StreamReader, StreamWriter
 from geoip_service import get_location_data
+
+countit = None
+
+
+async def create_countit():
+    global countit
+    logging.info(f"creating countit object")
+    countit = initialize()
+    if countit.test_connection():
+        logging.info(f"{str(countit)}")
 
 
 async def server(reader:StreamReader, writer:StreamWriter):
@@ -73,10 +83,10 @@ def main():
 
     settings.sleep_time = args.time
     settings.geoip_service = args.geoip
-
+    
+    asyncio.run(create_countit())
     asyncio.run(start_server(args.host, args.port))
 
 
 if __name__ == '__main__':
-    initialize()
     main()
