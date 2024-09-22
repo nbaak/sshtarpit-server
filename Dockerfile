@@ -1,10 +1,11 @@
 FROM python:latest
 
+COPY requirements.txt /tmp/requirements.txt
+
 RUN apt-get update && \
     apt-get upgrade -y && \
     pip3 install --upgrade pip && \
-    pip3 install prometheus-client && \
-    pip3 install requests && \
+    pip3 install -r /tmp/requirements.txt && \
     echo "DONE"
 
 ADD src/ /tarpit/
