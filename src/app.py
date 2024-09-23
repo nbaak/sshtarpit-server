@@ -57,6 +57,15 @@ async def server(reader:StreamReader, writer:StreamWriter):
         logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
 
         countit.inc('connections', label='stopped', value=1)
+    
+    except ConnectionResetError:
+        # Peer disconnected
+        Peers.remove_peer(peer)
+
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
+
+        countit.inc('connections', label='stopped', value=1)
 
     except Exception as e:
         logging.error('something bad happened')
