@@ -10,6 +10,7 @@ def purge_metrics(countit):
 def main():
     countit = initialize()
     metrics = countit.metrics()
+    # purge_metrics(countit)
     
     print("CONSOLE")
     for metric in metrics:
@@ -21,7 +22,6 @@ def main():
             print(values, label)
         print()
         
-    # purge_metrics(countit)
 
     
 if __name__ == "__main__":
