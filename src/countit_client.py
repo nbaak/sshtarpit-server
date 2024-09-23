@@ -121,6 +121,18 @@ class CountItClient():
         
         return None
     
+    def sum(self, metric_name:str, no_default=False) -> Union[int, float, None]:
+        """
+        get sum of values of metric
+        """
+        no_default_str = "?except_default=true" if no_default else ""
+        response = self.__get(f"/sum/{metric_name}{no_default_str}")
+        
+        if response and response.status_code == 201:
+            return response.json()["success"]
+        
+        return None
+    
     def metrics(self) -> list:
         """
         get metrics from service

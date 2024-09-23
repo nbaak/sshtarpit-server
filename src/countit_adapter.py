@@ -14,7 +14,7 @@ def initialize():
     try:
         cons = countit.add_metric("connections")
         cons_ip = countit.add_metric("connections_per_ip")
-        cons_dur = countit.add_metric("connection_duration")
+        cons_dur = countit.add_metric("connections_duration")
         
     except Exception as e:
         print(f"EXECPTION: {e}")

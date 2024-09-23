@@ -36,18 +36,19 @@ async def server(reader:StreamReader, writer:StreamWriter):
 
         logging.info(f'[{timestamp}] ACCEPT host={ip} port={port} country={country} country_code={country_code}')
 
-        # prometheus logging
+        # countit logging
         countit.inc('connections', label="started")
         countit.inc('connections_per_ip', label=[ip, country_code])
-
+        countit.inc('connections_per_ip', label=f"{ip},{country_code}")
+        
         while True:
             writer.write(b'%x\r\n' % random.randint(0, 2 ** 32))
             connection_duration = Peers.get_connection_duration(peer)
 
             await asyncio.sleep(settings.sleep_time)
             await writer.drain()
-
-            countit.inc('connection_duration', label=ip, value=settings.sleep_time)
+            
+            countit.inc('connections_duration', label=ip, value=settings.sleep_time)
 
     except BrokenPipeError:
         # Peer disconnected
