@@ -80,7 +80,8 @@ async def server(reader:StreamReader, writer:StreamWriter):
         if e.errno == errno.EHOSTUNREACH:
             logging.info(f"[{timestamp}] CLOSE (host unreachable) host={ip} port={port} time={connection_duration.total_seconds()}")
         
-        countit.inc('connections_session', label='stopped', value=1)
+        logging.error(f"[{timestamp}] OSError: {e}")
+        # countit.inc('connections_session', label='stopped', value=1)
         writer.close()
 
     except Exception as e:

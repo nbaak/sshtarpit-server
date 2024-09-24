@@ -1,21 +1,34 @@
 import logging
 import settings
 from countit_client import CountItClient
+import datetime
+
+
+def get_countit_client() -> CountItClient:
+    # ceate connection    
+    return CountItClient(server=settings.countit_server,
+                                      port=settings.countit_port,
+                                      token=settings.countit_secret)
 
 
 def initialize():
-    # ceate connection
-    global countit
-    countit = CountItClient(server=settings.countit_server,
-                                      port=settings.countit_port,
-                                      token=settings.countit_secret)
+    countit = get_countit_client()
     
     # create metrics
     try:
-        countit.add_metric("connections_session", overwrite=True)
-        countit.add_metric("connections_per_ip")
-        countit.add_metric("connections_duration")
-        countit.add_metric("connections_per_country")
+        cs = countit.add_metric("connections_session", overwrite=True)
+        cpi = countit.add_metric("connections_per_ip")
+        cd = countit.add_metric("connections_duration")
+        cpc = countit.add_metric("connections_per_country")
+        
+        logging.info(countit.metrics())
+        
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        logging.info(f"[{timestamp}] CREATED METRIC {cs}")
+        logging.info(f"[{timestamp}] CREATED METRIC {cpi}")
+        logging.info(f"[{timestamp}] CREATED METRIC {cd}")
+        logging.info(f"[{timestamp}] CREATED METRIC {cpc}")
         
     except Exception as e:
         print(f"EXECPTION: {e}")

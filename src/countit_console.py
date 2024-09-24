@@ -1,4 +1,4 @@
-from countit_adapter import initialize
+from countit_adapter import get_countit_client
 
 
 def purge_metrics(countit):
@@ -10,7 +10,7 @@ def purge_metrics(countit):
     
     
 def main():
-    countit = initialize()
+    countit = get_countit_client()
     metrics = countit.metrics()
     # purge_metrics(countit)
     
