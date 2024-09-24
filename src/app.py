@@ -39,6 +39,7 @@ async def server(reader:StreamReader, writer:StreamWriter):
         # countit logging
         countit.inc('connections', label="started", value=1)
         countit.inc('connections_per_ip', label=[ip, country_code], value=1)
+        countit.inc('connections_per_country', label=[country_code, country], value=1)
         
         while True:
             writer.write(b'%x\r\n' % random.randint(0, 2 ** 32))

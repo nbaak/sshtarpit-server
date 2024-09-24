@@ -153,6 +153,18 @@ class CountItClient():
         
         return ""
     
+    def data(self, metric_name:str) -> list:
+        """
+        returns the metric data structure as list, 
+            because flask can not transport tuple keys in dicts..
+        """        
+        response = self.__get(f"/data/{metric_name}")
+        
+        if response and response.status_code == 201:
+            return response.json()["success"]
+        
+        return []
+            
     def __str__(self):
         return f"CountIt: {self.server}:{self.port}"
     

@@ -12,9 +12,10 @@ def initialize():
     
     # create metrics
     try:
-        cons = countit.add_metric("connections")
-        cons_ip = countit.add_metric("connections_per_ip")
-        cons_dur = countit.add_metric("connections_duration")
+        countit.add_metric("connections")
+        countit.add_metric("connections_per_ip")
+        countit.add_metric("connections_duration")
+        countit.add_metric("connections_per_country")
         
     except Exception as e:
         print(f"EXECPTION: {e}")
