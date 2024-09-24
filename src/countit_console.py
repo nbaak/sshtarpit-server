@@ -24,6 +24,8 @@ def main():
         for label, value in sorted(data, key=lambda x: x[1], reverse=True):
             if label == "__default_label__": continue
             print(value, label)
+        
+        print()
 
     
 if __name__ == "__main__":
