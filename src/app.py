@@ -4,15 +4,16 @@ import asyncio
 import random
 import logging
 import argparse
-
 import settings
-from countit_adapter import initialize
+import errno
 
+from countit_adapter import initialize
 from peers import Peers
+from delta_timer import DeltaTimer
+
 from datetime import datetime
 from asyncio.streams import StreamReader, StreamWriter
 from geoip_service import get_location_data
-import errno
 
 countit = None
 
@@ -31,6 +32,7 @@ async def server(reader:StreamReader, writer:StreamWriter):
         peer = (ip, port)
         Peers.add_peer(peer)
         connection_time = Peers.connections[peer]
+        dt = DeltaTimer()
         timestamp = connection_time.strftime('%Y-%m-%d %H:%M:%S')
 
         country_code, country = get_location_data(ip)
@@ -49,7 +51,9 @@ async def server(reader:StreamReader, writer:StreamWriter):
             await asyncio.sleep(settings.sleep_time)
             await writer.drain()
             
-            countit.inc('connections_duration', label=ip, value=settings.sleep_time)
+            dtn = dt.delta_now()
+            countit.inc('connections_duration', label=ip, value=dtn)
+            # logging.info(f"[{timestamp}] ip={ip} is in here for another {dtn}s")
 
     except BrokenPipeError:
         # Peer disconnected
