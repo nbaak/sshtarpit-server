@@ -2,6 +2,7 @@ version: '3.1'
 
 volumes:
   app-data:
+    name: countit-data
 
 services:
 

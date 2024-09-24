@@ -64,7 +64,8 @@ async def server(reader:StreamReader, writer:StreamWriter):
         Peers.remove_peer(peer)
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
+        logging.info(f"[{timestamp}] PIPE BROKEN host={ip} port={port} time={connection_duration.total_seconds()}")
+        # logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
 
         countit.inc('connections', label='stopped', value=1)
         writer.close()
