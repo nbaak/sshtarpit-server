@@ -12,7 +12,7 @@ def initialize():
     
     # create metrics
     try:
-        countit.add_metric("connections")
+        countit.add_metric("connections_session", overwrite=True)
         countit.add_metric("connections_per_ip")
         countit.add_metric("connections_duration")
         countit.add_metric("connections_per_country")

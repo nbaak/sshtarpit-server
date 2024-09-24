@@ -66,8 +66,8 @@ class CountItClient():
             return True        
         return False
         
-    def add_metric(self, metric_name) -> str:
-        data = dict_builder()
+    def add_metric(self, metric_name, overwrite:bool=False) -> str:
+        data = dict_builder(overwrite=overwrite)
         response = self.__post(f"/new/{metric_name}", data)
         
         if response and response.status_code == 201:

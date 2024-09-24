@@ -40,7 +40,7 @@ async def server(reader:StreamReader, writer:StreamWriter):
         logging.info(f'[{timestamp}] ACCEPT host={ip} port={port} country={country} country_code={country_code}')
 
         # countit logging
-        countit.inc('connections', label="started", value=1)
+        countit.inc('connections_session', label="started", value=1)
         countit.inc('connections_per_ip', label=[ip, country_code], value=1)
         countit.inc('connections_per_country', label=[country_code, country], value=1)
         
@@ -62,7 +62,7 @@ async def server(reader:StreamReader, writer:StreamWriter):
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
 
-        countit.inc('connections', label='stopped', value=1)
+        countit.inc('connections_session', label='stopped', value=1)
         writer.close()
     
     except ConnectionResetError:
@@ -73,13 +73,14 @@ async def server(reader:StreamReader, writer:StreamWriter):
         logging.info(f"[{timestamp}] CLOSE (pipe broken) host={ip} port={port} time={connection_duration.total_seconds()}")
         # logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
 
-        countit.inc('connections', label='stopped', value=1)
+        countit.inc('connections_session', label='stopped', value=1)
         writer.close()
         
     except OSError as e:
         if e.errno == errno.EHOSTUNREACH:
             logging.info(f"[{timestamp}] CLOSE (host unreachable) host={ip} port={port} time={connection_duration.total_seconds()}")
         
+        countit.inc('connections_session', label='stopped', value=1)
         writer.close()
 
     except Exception as e:
