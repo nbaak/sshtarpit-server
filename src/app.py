@@ -12,6 +12,7 @@ from peers import Peers
 from datetime import datetime
 from asyncio.streams import StreamReader, StreamWriter
 from geoip_service import get_location_data
+import errno
 
 countit = None
 
@@ -65,10 +66,16 @@ async def server(reader:StreamReader, writer:StreamWriter):
         Peers.remove_peer(peer)
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        logging.info(f"[{timestamp}] PIPE BROKEN host={ip} port={port} time={connection_duration.total_seconds()}")
+        logging.info(f"[{timestamp}] CLOSE (pipe broken) host={ip} port={port} time={connection_duration.total_seconds()}")
         # logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
 
         countit.inc('connections', label='stopped', value=1)
+        writer.close()
+        
+    except OSError as e:
+        if e.errno == errno.EHOSTUNREACH:
+            logging.info(f"[{timestamp}] CLOSE (host unreachable) host={ip} port={port} time={connection_duration.total_seconds()}")
+        
         writer.close()
 
     except Exception as e:
