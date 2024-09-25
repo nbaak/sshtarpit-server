@@ -71,7 +71,6 @@ async def server(reader:StreamReader, writer:StreamWriter):
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         logging.info(f"[{timestamp}] CLOSE (pipe broken) host={ip} port={port} time={connection_duration.total_seconds()}")
-        # logging.info(f'[{timestamp}] CLOSE host={ip} port={port} time={connection_duration.total_seconds()}')
 
         countit.inc('connections_session', label='stopped', value=1)
         writer.close()
@@ -80,8 +79,13 @@ async def server(reader:StreamReader, writer:StreamWriter):
         if e.errno == errno.EHOSTUNREACH:
             logging.info(f"[{timestamp}] CLOSE (host unreachable) host={ip} port={port} time={connection_duration.total_seconds()}")
         
+        elif e.errno == errno.ETIMEDOUT:
+            logging.info(f"[{timestamp}] CLOSE (timeout) host={ip} port={port} time={connection_duration.total_seconds()}")
+        
+        # Peer disconnected
+        Peers.remove_peer(peer)
         logging.error(f"[{timestamp}] OSError: {e}")
-        # countit.inc('connections_session', label='stopped', value=1)
+        countit.inc('connections_session', label='stopped', value=1)
         writer.close()
 
     except Exception as e:
