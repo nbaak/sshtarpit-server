@@ -52,7 +52,7 @@ async def server(reader:StreamReader, writer:StreamWriter):
             await writer.drain()
             
             dtn = dt.delta_now()
-            countit.inc('connections_duration', label=ip, value=dtn)
+            countit.inc('connections_duration', label=(ip, country_code), value=dtn)
             # logging.info(f"[{timestamp}] ip={ip} is in here for another {dtn}s")
 
     except BrokenPipeError:
